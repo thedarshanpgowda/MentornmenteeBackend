@@ -7,7 +7,13 @@ const studentSchema = new mongoose.Schema({
   phone: String,
   email: String,
   branch: String,
-  sem: Number,
-}); 
+  mentorId: String,
+  dob: Date,
+  address: String,
+  father: String,
+  mother: String,
+  blood: String,
+  sem: String,
+});
 
 module.exports = mongoose.model("students", studentSchema);

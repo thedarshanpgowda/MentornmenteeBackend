@@ -3,9 +3,9 @@ const bcrypt = require("bcryptjs");
 const bodyParser = require("body-parser");
 const studentModel = require("../model/student");
 const facultyModel = require("../model/faculty");
+const reviewModel = require("../model/review");
 
 const jwt = require("jsonwebtoken");
-
 
 const app = express();
 
@@ -14,6 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 async function signinController(req, res) {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    // console.log(hashedPassword)
     const passwordMatching = await bcrypt.compare(
       req.body.confirmPassword,
       hashedPassword
@@ -26,8 +27,19 @@ async function signinController(req, res) {
         phone: req.body.phone,
         email: req.body.email,
         branch: req.body.branch,
+        mentorId: req.body.mentorId,
+        dob: req.body.dob,
+        address: req.body.address,
+        father: req.body.father,
+        mother: req.body.mother,
+        blood: req.body.blood,
+        sem : req.body.sem,
       };
 
+      const reviewData = {
+        usn: req.body.usn,
+        id: req.body.mentorId,
+      };
 
       const details = {
         usn: studentData.usn,
@@ -36,23 +48,23 @@ async function signinController(req, res) {
       const accessToken = jwt.sign(details, process.env.ACCESS_TOKEN_SECRET);
       res.header("authorization", `Bearer ${accessToken}`);
 
+      await reviewModel
+        .create(reviewData)
+        .then(() => {})
+        .catch((err) => {
+          console.log(`Error`);
+        });
 
       await studentModel
         .create(studentData)
-        .then(() => {
+        .then((data) => {
           res.status(200).json({
             status: "200: Success",
             message: "Student Added",
             studentInfo: {
-              usn: req.body.usn,
-              name: req.body.name,
-
-
+              data : data,
               token: accessToken,
-
-
             },
-
           });
         })
         .catch((err) => {
@@ -72,15 +84,12 @@ async function signinController(req, res) {
         branch: req.body.branch,
       };
 
-
-       const details = {
-        usn: facultyData.id,
-        userType: "student",
+      const details = {
+        id: facultyData.id,
+        userType: "faculty",
       };
       const accessToken = jwt.sign(details, process.env.ACCESS_TOKEN_SECRET);
       res.header("authorization", `Bearer ${accessToken}`);
-
-
 
       await facultyModel
         .create(facultyData)
@@ -92,10 +101,7 @@ async function signinController(req, res) {
               id: req.body.id,
               name: req.body.name,
 
-
               token: accessToken,
-
-
             },
           });
         })
@@ -104,7 +110,6 @@ async function signinController(req, res) {
           res.status(400).json({
             status: "400: Bad Request",
             message: "Unable to add faculty",
-            
           });
         });
     } else {

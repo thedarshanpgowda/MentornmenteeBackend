@@ -1,11 +1,12 @@
 const questionModel = require("../model/question");
+const reviewModel = require("../model/review");
 
 async function facultyGetController(req, res) {
   try {
     if (req.user.userType === "faculty") {
       const searchCondition = { id: req.user.id, isAnswered: false };
       // console.log(req.user.id);
-      questionModel
+      await questionModel
         .find(searchCondition)
         .then((datas) => {
           datas.forEach((data) => {
@@ -50,7 +51,7 @@ async function facultyPostController(req, res) {
       };
       const searchCondition = { qid: req.body.qid };
 
-      questionModel
+      await questionModel
         .findOneAndUpdate(searchCondition, updateFields)
         .then(() => {
           res.status(200).json({
@@ -80,4 +81,99 @@ async function facultyPostController(req, res) {
   }
 }
 
-module.exports = { facultyGetController, facultyPostController };
+async function facultyGetReviewController(req, res) {
+  try {
+    if (req.user.userType === "faculty") {
+      const searchCondition = { id: req.user.id };
+      await reviewModel
+        .find(searchCondition)
+        .then((data) => {
+          res.status(200).json({
+            status: "200: Success",
+            message: "Review retrieved",
+            data: data,
+          });
+        })
+        .catch((err) => {
+          console.log(`Error: controllers/facultyController.js \n${err}`);
+          res.status(400).json({
+            status: "400: Bad Request",
+            message: "Unable to retrieve reviews",
+          });
+        });
+    } else {
+      res.status(400).json({
+        status: "400: Bad Request",
+        message: "Unauthorized faculty",
+      });
+    }
+  } catch (err) {
+    console.log(`Error: controllers/facultyController.js \n${err}`);
+    res.status(500).json({
+      status: "500: Internal Server Error",
+      message: "Unable to retrieve reviews",
+    });
+  }
+}
+
+async function facultyPostReviewController(req, res) {
+  try {
+    if (req.user.userType === "faculty") {
+      const cieNo = req.body.cieNo;
+      let updateFields = {};
+      if (cieNo == 1) {
+        updateFields = {
+          $set: { "cie1.facultyComment": req.body.comment },
+        };
+      } else if (cieNo == 2) {
+        updateFields = {
+          $set: { "cie2.facultyComment": req.body.comment },
+        };
+      } else if (cieNo == 3) {
+        updateFields = {
+          $set: { "cie3.facultyComment": req.body.comment },
+        };
+      } else if (cieNo == 4) {
+        updateFields = {
+          $set: { "see.facultyComment": req.body.comment },
+        };
+      }
+
+      const searchCondition = { usn: req.body.usn };
+
+      reviewModel
+        .findOneAndUpdate(searchCondition, updateFields)
+        .then(() => {
+          res.status(200).json({
+            status: "200: Success",
+            message: "Review submitted",
+          });
+        })
+        .catch((err) => {
+          console.log(`Error: controllers/facultyController.js \n${err}`);
+          res.status(400).json({
+            status: "400: Bad Request",
+            message: "Unable to submit review",
+          });
+        });
+    } else {
+      res.status(400).json({
+        status: "400: Bad Request",
+        message: "Unauthorized faculty",
+      });
+    }
+  } catch (err) {
+    console.log(`Error: controllers/facultyController.js \n${err}`);
+    res.status(500).json({
+      status: "500: Internal Server Error",
+      message: "Unable to submit review",
+    });
+  }
+}
+
+module.exports = {
+  facultyGetController,
+  facultyPostController,
+  facultyGetReviewController,
+  facultyPostReviewController,
+};

@@ -13,10 +13,16 @@ async function studentLoginController(req, res) {
   try {
     const enteredUsn = req.body.usn;
     const enteredPassword = req.body.password;
+    // console.log(enteredPassword)
+    // console.log(enteredUsn)
     const studentProfile = await studentModel.findOne({ usn: enteredUsn });
     const checkPassword =
-      studentProfile &&
-      ( bcrypt.compare(enteredPassword, studentProfile.password));
+      (await bcrypt.compare(enteredPassword, studentProfile.password));
+    // console.log(checkPassword)
+
+    // console.log(studentProfile.password)
+    // console.log(await bcrypt.hash(enteredPassword,10))
+
     if (checkPassword) {
       const details = {
         usn: studentProfile.usn,
@@ -28,9 +34,8 @@ async function studentLoginController(req, res) {
         status: "200: OK",
         message: "Access granted",
         studentInfo: {
-          usn: studentProfile.usn,
-          name: studentProfile.name,
-          token : accessToken
+          data: studentProfile,
+          token: accessToken
         },
       });
     } else {
@@ -53,7 +58,7 @@ async function facultyLoginController(req, res) {
     const facultyProfile = await facultyModel.findOne({ id: enteredId });
     const checkPassword =
       facultyProfile &&
-      ( bcrypt.compare(enteredPassword, facultyProfile.password));
+      (await bcrypt.compare(enteredPassword, facultyProfile.password));
 
     if (checkPassword) {
       const details = {
@@ -68,7 +73,7 @@ async function facultyLoginController(req, res) {
         facultyInfo: {
           id: facultyProfile.id,
           name: facultyProfile.name,
-          token : accessToken
+          token: accessToken
         },
       });
     } else {

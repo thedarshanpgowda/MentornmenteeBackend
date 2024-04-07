@@ -22,7 +22,7 @@ try {
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Success: NodeJs server started on ${port}`);
+  console.log(`Success: NodeJs server started on PORT:${port}`);
 });
 
 // Terminate the server during uncaught exception
