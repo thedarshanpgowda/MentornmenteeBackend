@@ -1,5 +1,6 @@
 const questionModel = require("../model/question");
 const reviewModel = require("../model/review");
+const studentModel = require("../model/student");
 
 async function facultyGetController(req, res) {
   try {
@@ -85,13 +86,25 @@ async function facultyGetReviewController(req, res) {
   try {
     if (req.user.userType === "faculty") {
       const searchCondition = { id: req.user.id };
+
+
+
       await reviewModel
         .find(searchCondition)
-        .then((data) => {
+        .then(async (data) => {
+          const newData = await Promise.all(data.map(async (stud) => {
+            const usn = stud.usn;
+            const studDet = await studentModel.findOne({ usn: usn });
+            // console.log(studDet)
+            return {
+              ...stud.toObject(),
+              studentInfo: studDet
+            };
+          }));
           res.status(200).json({
             status: "200: Success",
             message: "Review retrieved",
-            data: data,
+            data: newData,
           });
         })
         .catch((err) => {

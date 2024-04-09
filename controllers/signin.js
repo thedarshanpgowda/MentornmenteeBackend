@@ -29,12 +29,14 @@ async function signinController(req, res) {
         branch: req.body.branch,
         mentorId: req.body.mentorId,
         dob: req.body.dob,
-        address: req.body.address,
+        address: req.body.addr,
         father: req.body.father,
         mother: req.body.mother,
         blood: req.body.blood,
         sem : req.body.sem,
+        img : req.body.profilepic,
       };
+      console.log(studentData)
 
       const reviewData = {
         usn: req.body.usn,

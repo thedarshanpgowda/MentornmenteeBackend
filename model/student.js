@@ -8,12 +8,13 @@ const studentSchema = new mongoose.Schema({
   email: String,
   branch: String,
   mentorId: String,
-  dob: Date,
+  dob: String,
   address: String,
   father: String,
   mother: String,
   blood: String,
   sem: String,
+  img : String,
 });
 
 module.exports = mongoose.model("students", studentSchema);
