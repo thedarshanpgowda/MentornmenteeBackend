@@ -180,6 +180,7 @@ async function studentUpdateController(req, res) {
         mentorId: req.body.mentorId,
         dob: req.body.dob,
         address: req.body.addr,
+        img : req.body.img,
         father: req.body.father,
         mother: req.body.mother,
         blood: req.body.blood,
@@ -196,6 +197,7 @@ async function studentUpdateController(req, res) {
       await studentModel
         .findOneAndUpdate(searchCondition, updateData)
         .then((data) => {
+          // console.log(data)
           res.status(200).json({
             status: "200: Success",
             message: "Profile-data updated",
